@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 echo "Running composer"
-composer install --no-dev --working-dir=/var/www/html
+apt-get update && apt-get install -y php-bcmath
 
+composer install --no-dev --working-dir=/var/www/html
 echo "Caching config..."
 php artisan config:cache
 
