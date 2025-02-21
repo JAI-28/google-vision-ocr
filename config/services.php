@@ -30,5 +30,18 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'google' => [
+        'google' => [
+            'credentials' => function () {
+                if (env('GOOGLE_APPLICATION_CREDENTIALS_JSON')) {
+                    $keyFilePath = storage_path('app/visionkey.json');
+                    file_put_contents($keyFilePath, env('GOOGLE_APPLICATION_CREDENTIALS_JSON'));
+                    putenv("GOOGLE_APPLICATION_CREDENTIALS={$keyFilePath}");
+                    return $keyFilePath;
+                }
+                return null;
+            },
+        ],
+    ],
 
 ];
