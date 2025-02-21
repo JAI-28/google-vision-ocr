@@ -22,8 +22,10 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') == 'production') {
             $this->app['request']->server->set('HTTPS', true);
         }
-        if (config('services.google.credentials')) {
-            putenv("GOOGLE_APPLICATION_CREDENTIALS=" . config('services.google.credentials'));
+        $keyFilePath = config('services.google.credentials');
+        if (file_exists($keyFilePath)) {
+            chmod($keyFilePath, 0644); 
+            putenv("GOOGLE_APPLICATION_CREDENTIALS={$keyFilePath}");
         }
     }
 }
