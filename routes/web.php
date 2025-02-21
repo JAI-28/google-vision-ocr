@@ -15,7 +15,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
-Route::resource('google', GoogleController::class);
+    return view('index');
+})->name('home');
+Route::resource('google', GoogleController::class)->names([
+    'index'   => 'google.index',
+    'create'  => 'google.create',
+    'store'   => 'google.store',
+    'show'    => 'google.show',
+    'edit'    => 'google.edit',
+    'update'  => 'google.update',
+    'destroy' => 'google.destroy',
+]);
 Route::post('/analyze', [GoogleController::class, 'analyzeFile'])->name('google.analyze');
+Route::get('/result/{id}', [GoogleController::class, 'results'])->name('google.result');

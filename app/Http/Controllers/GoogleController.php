@@ -26,7 +26,8 @@ class GoogleController extends Controller
      */
     public function index()
     {
-        return view('index');
+        $results = Google::latest()->paginate(10);
+        return view('list', compact('results'));
     }
 
     /**
@@ -42,15 +43,21 @@ class GoogleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'detected_text' => 'required',
+            'file_path' => 'required|string',
+        ]);
+
+        $Google = Google::create($request->all());
+        return response()->json($Google, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Google $google)
+    public function show($id)
     {
-        //
+        return response()->json(Google::findOrFail($id));
     }
 
     /**
@@ -72,9 +79,10 @@ class GoogleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Google $google)
+    public function destroy($id)
     {
-        //
+        Google::findOrFail($id)->delete();
+        return response()->json(['message' => 'Google deleted successfully']);
     }
 
     public function analyzeFile(Request $request)
@@ -125,24 +133,21 @@ class GoogleController extends Controller
             $batchRequest = (new BatchAnnotateFilesRequest())->setRequests([$fileRequest]);
 
             $response = $imageAnnotator->batchAnnotateFiles($batchRequest);
-            // $textAnnotations = $response->getResponses()[0];
-            // dd($textAnnotations->getResponses()[0]->getContext());
-            // if ($textAnnotations) {
-            //     $text = $textAnnotations->getText();
-            //     return response()->json(['text' => $text]);
-            // }
-            $fileResponse = $response->getResponses()[0]; // First file response
+            $fileResponse = $response->getResponses()[0];
 
-if ($fileResponse->getResponses()) {
-    $annotationResponse = $fileResponse->getResponses()[0]; // First annotation response
+            if ($fileResponse->getResponses()) {
+                $annotationResponse = $fileResponse->getResponses()[0];
 
-    if ($annotationResponse->hasFullTextAnnotation()) {
-        $fullTextAnnotation = $annotationResponse->getFullTextAnnotation();
-        $text = $fullTextAnnotation->getText(); // Extract text
-
-        return response()->json(['text' => $text]);
-    }
-}
+                if ($annotationResponse->hasFullTextAnnotation()) {
+                    $fullTextAnnotation = $annotationResponse->getFullTextAnnotation();
+                    $text = $fullTextAnnotation->getText();
+                    $Google = Google::create([
+                        'detected_text' => $text,
+                        'file_path' => $filePath
+                    ]);
+                    return response()->json(['Google' => $Google], 201);
+                }
+            }
         } else {
             $image = (new Image())->setContent($content);
 
@@ -159,15 +164,32 @@ if ($fileResponse->getResponses()) {
             if ($textAnnotations) {
     
                 $detectedText = $textAnnotations[0]->getDescription();
-    
-                return response()->json(['detectedText' => $detectedText]);
+                $Google = Google::create([
+                    'detected_text' => $detectedText,
+                    'file_path' => $filePath
+                ]);
+                return response()->json(['Google' => $Google]);
     
             } else {
-    
                 return response()->json(['message' => 'No text detected'], 404);
-    
             }
         }
         return response()->json(['text' => 'not found']);
+    }
+    public function results($id){
+        $result=Google::findOrFail($id);
+        $lines = explode("\n", $result->detected_text);
+        $data = [];
+        foreach ($lines as $line) {
+            $parts = explode(":", $line, 2);
+            if (count($parts) == 2) {
+                $key = trim($parts[0]);
+                $value = trim($parts[1]);
+                $data[$key] = $value;
+            } else {
+                $data[] = trim($line);
+            }
+        }
+        return view('view',compact('result','data'));
     }
 }
