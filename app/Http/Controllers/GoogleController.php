@@ -90,7 +90,7 @@ class GoogleController extends Controller
         function uploadToGCS($file)
         {
             $storage = new StorageClient([
-                'keyFilePath' => storage_path('app/visionkey.json'),
+                'keyFilePath' => config('services.google.credentials'),
             ]);
     
             $bucketName = 'pomtech_ocr_bucket';
@@ -114,7 +114,7 @@ class GoogleController extends Controller
         $fullPath = Storage::path('/public/'. $filePath);
 
         $imageAnnotator = new ImageAnnotatorClient([
-            'credentials' => storage_path('app/visionkey.json'),
+            'credentials' => config('services.google.credentials'),
         ]);
         $content = file_get_contents($fullPath);
 

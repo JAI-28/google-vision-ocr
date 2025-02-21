@@ -22,5 +22,8 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') == 'production') {
             $this->app['request']->server->set('HTTPS', true);
         }
+        if (config('services.google.credentials')) {
+            putenv("GOOGLE_APPLICATION_CREDENTIALS=" . config('services.google.credentials'));
+        }
     }
 }
