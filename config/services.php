@@ -31,7 +31,7 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
     'google' => [
-        'credentials' => env('GOOGLE_APPLICATION_CREDENTIALS', '/etc/secrets/visionkey.json'),
+        'credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
     ],
 
 ];
