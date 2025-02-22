@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 echo "Running composer"
-apt-get update && apt-get install -y php-bcmath
 
 composer install --no-dev --working-dir=/var/www/html
 echo "Caching config..."
