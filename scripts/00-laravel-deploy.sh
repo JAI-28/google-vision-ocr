@@ -10,6 +10,6 @@ php artisan route:cache
 
 echo "Running migrations..."
 php artisan migrate --force 
-php artisan storage:link 
+php artisan storage:link --verbose
 echo "Publishing cloudinary provider..."
 php artisan vendor:publish --provider="CloudinaryLabs\CloudinaryLaravel\CloudinaryServiceProvider" --tag="cloudinary-laravel-config"
